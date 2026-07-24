@@ -1,0 +1,29 @@
+services:
+  # ---- the database ----
+  db:
+    image: postgres:16-alpine          # ready-made PostgreSQL image, nothing to build
+    environment:                       # PostgreSQL reads these on first start
+      POSTGRES_USER: leaderboard
+      POSTGRES_PASSWORD: leaderboard   # fine for local dev only — never reuse in the cloud
+      POSTGRES_DB: leaderboard
+    healthcheck:                       # lets Compose know when the DB is truly ready
+      test: ["CMD-SHELL", "pg_isready -U leaderboard"]
+      interval: 3s
+      retries: 15
+    volumes:
+      - db-data:/var/lib/postgresql/data   # keep data across restarts
+
+  # ---- your app ----
+  app:
+    build: .                           # build from the Dockerfile in this folder
+    ports:
+      - "8000:8000"                    # your-machine:container — reach it at localhost:8000
+    environment:
+      # This is the DATABASE_URL app.py reads. Note the host is "db" — the service name above.
+      DATABASE_URL: postgresql://leaderboard:leaderboard@db:5432/leaderboard
+    depends_on:
+      db:
+        condition: service_healthy     # wait until the DB passes its healthcheck first
+
+volumes:
+  db-data:

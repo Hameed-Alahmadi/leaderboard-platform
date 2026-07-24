@@ -1,0 +1,64 @@
+name: CI pipeline
+
+on:
+  push:                     # run on every push to main…
+    branches: [main]
+  pull_request:             # …and on pull requests too
+    branches: [main]
+
+jobs:
+  # ---- JOB 1: lint the code and run the tests ----
+  lint-and-test:
+    runs-on: ubuntu-latest
+    services:               # a throwaway PostgreSQL for the tests to use
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4               # get your code
+      - uses: actions/setup-python@v5           # install Python
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: ruff check .                       # lint
+      - run: pytest -v                          # test
+
+  # ---- JOB 2: build the image, scan it, publish it ----
+  build-scan-publish:
+    needs: lint-and-test        # only runs if JOB 1 passed
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write           # allow publishing to GHCR
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with: { context: ., load: true, tags: leaderboard-api:ci }
+      - name: Scan for vulnerabilities
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: leaderboard-api:ci
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "0"        # report only for now (change to "1" to fail on findings)
+      - name: Log in to GHCR
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & push
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest

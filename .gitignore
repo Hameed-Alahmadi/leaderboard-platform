@@ -1,0 +1,8 @@
+# secrets / dumps — never commit
+*.sql
+secret-plain.yaml
+*.env
+.env
+# python junk
+__pycache__/
+*.pyc

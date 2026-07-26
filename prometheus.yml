@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s          # pull metrics every 5 seconds
+
+scrape_configs:
+  - job_name: leaderboard
+    static_configs:
+      - targets: ["app:8000"]  # reach the app by its service name

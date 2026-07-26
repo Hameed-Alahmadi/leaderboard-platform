@@ -3,7 +3,7 @@
 import os
 import psycopg
 from flask import Flask, jsonify, request
-
+from prometheus_flask_exporter import PrometheusMetrics  
 
 def get_conn():
     # Connect to the database using the address in the DATABASE_URL environment
@@ -25,9 +25,9 @@ def init_db():
             """
         )
 
-
 def create_app():
     app = Flask(__name__)
+    PrometheusMetrics(app)   # it creates the /metrics endpoint
     init_db()
 
     @app.get("/healthz")

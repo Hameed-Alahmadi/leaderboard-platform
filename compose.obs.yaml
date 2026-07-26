@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: leaderboard
+      POSTGRES_PASSWORD: leaderboard
+      POSTGRES_DB: leaderboard
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U leaderboard"]
+      interval: 3s
+      retries: 15
+
+  app:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: postgresql://leaderboard:leaderboard@db:5432/leaderboard
+    depends_on:
+      db:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports: ["9090:9090"]
+
+  grafana:
+    image: grafana/grafana
+    ports: ["3000:3000"]

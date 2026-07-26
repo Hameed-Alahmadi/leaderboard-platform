@@ -3,12 +3,25 @@ kind: Deployment
 metadata: { name: app }
 spec:
   replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0     # never go below the wanted count during a rollout
+      maxSurge: 1           # add one new pod at a time
+  minReadySeconds: 5        # a new pod must stay ready 5s before continuing
   selector: { matchLabels: { app: app } }
   template:
     metadata: { labels: { app: app } }
     spec:
       containers:
         - name: app
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           image: ghcr.io/hameed-alahmadi/leaderboard2-api:latest
           env:
             - name: DATABASE_URL

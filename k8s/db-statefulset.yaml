@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: { name: db }
+spec:
+  serviceName: db
+  replicas: 1
+  selector: { matchLabels: { app: db } }
+  template:
+    metadata: { labels: { app: db } }
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+            - { name: POSTGRES_USER, value: leaderboard }
+            - { name: POSTGRES_PASSWORD, value: leaderboard }
+            - { name: POSTGRES_DB, value: leaderboard }
+            # store data in a sub-folder so Postgres is happy on a fresh volume:
+            - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+          ports: [{ containerPort: 5432 }]
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:                 # every pod gets its own 1Gi disk
+    - metadata: { name: data }
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources: { requests: { storage: 1Gi } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: db }
+spec:
+  selector: { app: db }
+  ports: [{ port: 5432, targetPort: 5432 }]

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: app-sa }
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: { name: app-role }
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]     # read-only, pods only — nothing else
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: { name: app-rolebinding }
+subjects:
+  - kind: ServiceAccount
+    name: app-sa
+roleRef:
+  kind: Role
+  name: app-role
+  apiGroup: rbac.authorization.k8s.io

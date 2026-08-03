@@ -13,8 +13,15 @@ spec:
   template:
     metadata: { labels: { app: app } }
     spec:
+      serviceAccountName: app-sa
       containers:
         - name: app
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000        # force a non-root uid (image has no USER of its own)
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           resources:
             requests:
               cpu: 100m

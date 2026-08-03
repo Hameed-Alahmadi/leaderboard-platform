@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: leaderboard-dev
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hameed-alahmadi/leaderboared2-api.git
+    path: chart    # the Helm chart folder
+    targetRevision: main
+    helm:
+      valueFiles: [values-dev.yaml]
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true]

@@ -1,0 +1,2 @@
+replicaCount: 2
+image: ghcr.io/hameed-alahmadi/leaderboard2-api:latest

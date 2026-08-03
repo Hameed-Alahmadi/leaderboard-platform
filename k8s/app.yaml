@@ -18,7 +18,6 @@ spec:
         - name: app
           securityContext:
             runAsNonRoot: true
-            runAsUser: 1000        # force a non-root uid (image has no USER of its own)
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]

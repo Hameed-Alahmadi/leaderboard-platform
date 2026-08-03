@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py .
 
 RUN useradd -u 1000 -m appuser
-USER appuser
+USER 1000
 
 # Document that the app listens on port 8000.
 EXPOSE 8000

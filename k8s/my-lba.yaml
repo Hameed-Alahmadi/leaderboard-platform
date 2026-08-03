@@ -1,0 +1,6 @@
+apiVersion: demo.io/v1
+kind: LeaderboardApp
+metadata:
+  name: prod
+spec:
+  replicas: 4

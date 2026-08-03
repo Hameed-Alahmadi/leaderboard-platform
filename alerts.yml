@@ -1,0 +1,11 @@
+groups:
+  - name: slo
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(flask_http_request_total{status=~"5.."}[5m]))
+            / sum(rate(flask_http_request_total[5m])) > 0.005
+        for: 5m
+        labels: { severity: page }
+        annotations:
+          summary: "Error rate over 0.5% — burning the error budget"

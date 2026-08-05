@@ -45,6 +45,12 @@ Traffic, p50/p95 latency, error-rate SLI, and request breakdowns by status code,
 
 ![Grafana dashboard](docs/screenshots/grafana.gif)
 
+**CI/CD — every push is tested before it ships**
+
+`build-scan-publish` only runs once `lint-and-test` passes, so an image never reaches the registry unless the tests and the vulnerability scan are green.
+
+![GitHub Actions pipeline — both jobs passing](docs/screenshots/ci-pipeline.png)
+
 ---
 
 ## Tech stack

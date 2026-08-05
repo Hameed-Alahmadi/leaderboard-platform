@@ -6,3 +6,4 @@ secret-plain.yaml
 # python junk
 __pycache__/
 *.pyc
+etcd-snapshot.db

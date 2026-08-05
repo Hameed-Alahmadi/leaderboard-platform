@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/hameed-alahmadi/leaderboard2-api.git
+    repoURL: https://github.com/hameed-alahmadi/leaderboard-platform.git
     path: k8s
     targetRevision: main
   destination:

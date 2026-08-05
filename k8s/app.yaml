@@ -28,7 +28,7 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
-          image: ghcr.io/hameed-alahmadi/leaderboard2-api:latest
+          image: ghcr.io/hameed-alahmadi/leaderboard-platform:latest
           env:
             - name: DATABASE_URL
               value: postgresql://leaderboard:leaderboard@db:5432/leaderboard

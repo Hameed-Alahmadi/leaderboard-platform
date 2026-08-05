@@ -1,6 +1,6 @@
 # Leaderboard API — End-to-End DevOps Project
 
-![CI](https://github.com/hameed-alahmadi/leaderboard2-api/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/hameed-alahmadi/leaderboard-platform/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![Kubernetes](https://img.shields.io/badge/kubernetes-ready-326CE5)
 ![GitOps](https://img.shields.io/badge/GitOps-Argo%20CD-EF7B4D)
@@ -94,7 +94,7 @@ Defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml). On every push
 1. **Lint & test** — `ruff` + `pytest` against a throwaway PostgreSQL service.
 2. **Build, scan, publish** — build the image, scan it with **Trivy** (CRITICAL/HIGH), and push to **GHCR** on `main`.
 
-The image is published to `ghcr.io/hameed-alahmadi/leaderboard2-api`.
+The image is published to `ghcr.io/hameed-alahmadi/leaderboard-platform`.
 
 ---
 

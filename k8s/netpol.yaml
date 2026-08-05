@@ -17,3 +17,14 @@ spec:
         - podSelector: { matchLabels: { app: app } }
       ports:
         - port: 5432
+---
+# 3) …and: the app itself must stay reachable on 8000
+#    (without this, default-deny blocks the load generator and any ingress)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: allow-ingress-to-app }
+spec:
+  podSelector: { matchLabels: { app: app } }
+  ingress:
+    - ports:
+        - port: 8000

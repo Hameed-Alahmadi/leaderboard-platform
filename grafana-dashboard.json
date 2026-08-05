@@ -1,0 +1,118 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Traffic — requests/sec",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 15, "lineWidth": 2 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(flask_http_request_total[1m]))", "legendFormat": "total req/s" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Errors — 5xx error ratio (SLI)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "custom": { "fillOpacity": 20, "lineWidth": 2 }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 0.005 } ] } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [
+        { "refId": "A", "expr": "clamp_max(sum(rate(flask_http_request_total{status=~\"5..\"}[5m])) / sum(rate(flask_http_request_total[5m])) or vector(0), 1)", "legendFormat": "error ratio" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Latency — p95 request duration",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "s", "custom": { "fillOpacity": 10, "lineWidth": 2 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.95, sum by (le) (rate(flask_http_request_duration_seconds_bucket[5m])))", "legendFormat": "p95" },
+        { "refId": "B", "expr": "histogram_quantile(0.50, sum by (le) (rate(flask_http_request_duration_seconds_bucket[5m])))", "legendFormat": "p50 (median)" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Service up",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "short", "mappings": [ { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } } ], "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] } }, "overrides": [] },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value", "reduceOptions": { "calcs": [ "lastNotNull" ] } },
+      "targets": [
+        { "refId": "A", "expr": "up{job=\"leaderboard\"}", "legendFormat": "app" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Requests/sec by status code",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": [ "lastNotNull" ], "fields": "", "values": false } },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(flask_http_request_total{status=\"200\"}[1m])) or vector(0)", "legendFormat": "200" },
+        { "refId": "B", "expr": "sum(rate(flask_http_request_total{status=\"201\"}[1m])) or vector(0)", "legendFormat": "201" },
+        { "refId": "C", "expr": "sum(rate(flask_http_request_total{status=\"400\"}[1m])) or vector(0)", "legendFormat": "400" },
+        { "refId": "D", "expr": "sum(rate(flask_http_request_total{status=\"500\"}[1m])) or vector(0)", "legendFormat": "500" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Requests/sec by path (endpoint)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 15, "lineWidth": 2, "stacking": { "mode": "normal" } } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": [ "mean", "lastNotNull" ] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "refId": "A", "expr": "sum by (path) (rate(flask_http_request_duration_seconds_count[1m]))", "legendFormat": "{{path}}" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Requests/sec by method",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 15, "lineWidth": 2 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "refId": "A", "expr": "sum by (method) (rate(flask_http_request_total[1m]))", "legendFormat": "{{method}}" }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": [ "leaderboard", "golden-signals" ],
+  "templating": {
+    "list": [
+      {
+        "name": "DS_PROMETHEUS",
+        "label": "Prometheus",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "hide": 0
+      }
+    ]
+  },
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": { "refresh_intervals": [ "5s", "10s", "30s", "1m" ] },
+  "title": "Leaderboard — System Monitoring (Golden Signals)",
+  "uid": "leaderboard-golden-final",
+  "version": 1
+}

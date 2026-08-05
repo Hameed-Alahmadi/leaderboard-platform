@@ -31,6 +31,22 @@ flowchart LR
 
 ---
 
+## Screenshots
+
+**Argo CD — the full application tree, synced from Git**
+
+Every resource reconciled from `k8s/`: the Deployment and its live pods, the PostgreSQL StatefulSet with its PVC, Services, HPA, SealedSecret, NetworkPolicies, RBAC, and a custom CRD — all `Healthy` and `Synced`.
+
+![Argo CD application tree — Healthy and Synced](docs/screenshots/argocd.gif)
+
+**Grafana — live service metrics**
+
+Traffic, p50/p95 latency, error-rate SLI, and request breakdowns by status code, endpoint, and method.
+
+![Grafana dashboard](docs/screenshots/grafana.gif)
+
+---
+
 ## Tech stack
 
 | Layer | Tools |
